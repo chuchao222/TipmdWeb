@@ -7,7 +7,7 @@ GRANT ALL PRIVILEGES ON tipmd_test.* TO 'tipmd_test_user'@'localhost' IDENTIFIED
 FLUSH PRIVILEGES; 
 
 USE tipmd_test;
-
+ 
 /*
 Navicat MySQL Data Transfer
 
