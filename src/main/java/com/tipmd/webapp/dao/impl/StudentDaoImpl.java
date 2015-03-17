@@ -4,7 +4,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.tipmd.webapp.dao.iface.IStudentDao;
-import com.tipmd.webapp.dao.impl.GenericDaoImpl.GenericDaoConfiguration;
 import com.tipmd.webapp.entity.Student;
 
 @Repository("iStudentDao")
