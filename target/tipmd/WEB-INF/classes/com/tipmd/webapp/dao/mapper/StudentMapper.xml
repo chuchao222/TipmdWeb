@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 让namespace和 包名.Mapper文件名 一致 -->
+<mapper namespace="StudentMapper">
+	<!-- demonstrate how to use typeHandler -->
+	<resultMap type="com.tipmd.webapp.entity.Student" id="studentMap">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="pwd" property="pwd"/>
+		<result column="birthday" property="birthday"/>
+		<result column="sex" property="sex" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"/>
+	</resultMap>
+	
+	<!-- demonstrate 1:N -->
+	<resultMap type="com.tipmd.webapp.entity.Student" id="studentScoresMap">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="pwd" property="pwd"/>
+		<result column="birthday" property="birthday"/>
+		<result column="sex" property="sex" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler"/>
+		
+		<collection property="scores" ofType="Score">
+			<id column="scoreId" property="id"/>
+			<result column="student_id" property="student.id"/>
+			<!-- 
+			<result column="course_id" property="course.id"/>
+			 -->
+			<result column="points" property="points"/>
+		</collection>
+	</resultMap>
+	
+	<!-- 
+		resultType refers typeAlias in mybatis-config.xml  
+		id should equals the method name defined in class Student
+		notice that we use resultMap instead of resultType because we want to demonstrate enum typeHandler
+	-->
+    <select id="getStudentById" resultMap="studentMap"> <!-- resultType="Student" -->
+        select * from students where id = #{id}
+    </select>
+    
+    <!-- demonstrate 1:N -->
+    <select id="getStudentAndScoresById" resultMap="studentScoresMap">
+        select stu.*, sc.id as scoreId, sc.student_id, sc.points from students stu left join scores sc on stu.id = sc.student_id 
+        where stu.id = #{id}
+    </select>
+    
+    <!-- another demo to demonstrate the usage of typeHandler -->
+    <insert id="createStudent" parameterType="Student" useGeneratedKeys="true">
+	    insert into students (name, pwd, sex, birthday) values (
+	    #{name}, #{pwd}, #{sex, typeHandler=org.apache.ibatis.type.EnumOrdinalTypeHandler}, #{birthday})
+	    <selectKey resultType="int" order="AFTER" keyProperty="id" >
+			SELECT LAST_INSERT_ID() AS id    
+    	</selectKey>
+	</insert>
+	
+	<select id="getStudents" resultMap="studentMap" parameterType="Student">
+		select * from students 
+	</select>
+	
+	<select id="getCountOfStudents" resultType="int" parameterType="Student">
+		select count(*) from students 
+	</select>
+	
+	<update id="updateStudent" >
+        update students set 
+        pwd=#{pwd}, 
+        birthday=#{birthday}
+        where id=#{id}
+	</update>
+	
+	<delete id="deleteStudent">
+        delete from students where id=#{id}
+    </delete>
+    
+</mapper>

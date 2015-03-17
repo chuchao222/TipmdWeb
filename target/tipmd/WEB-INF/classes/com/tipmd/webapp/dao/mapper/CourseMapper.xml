@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CourseMapper">
+	 <select id="findById" resultType="Course">
+        select * from courses where id = #{id}
+    </select>
+    
+    <insert id="createCourse" parameterType="Course" useGeneratedKeys="true">
+	    insert into courses (name, credit) values (#{name}, #{credit})
+	    <selectKey resultType="int" order="AFTER" keyProperty="id" >
+			SELECT LAST_INSERT_ID() AS id    
+    	</selectKey>
+	</insert>
+	
+	<select id="findAll" resultType="Course" parameterType="Course">
+		select * from courses 
+	</select>
+	
+	<select id="findCountOfAll" resultType="int" parameterType="Course">
+		select count(*) from courses 
+	</select>
+	
+	<update id="update" >
+        update courses set 
+        name=#{name}, 
+        credit=#{credit}
+        where id=#{id}
+	</update>
+	
+	<delete id="deleteById">
+        delete from courses where id=#{id}
+    </delete>
+</mapper>
