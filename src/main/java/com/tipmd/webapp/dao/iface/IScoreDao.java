@@ -5,6 +5,6 @@ import java.util.List;
 import com.tipmd.webapp.entity.Score;
 
 public interface IScoreDao {
-	void addScore(Score score);
+	//void addScore(Score score);
 	List<Score> getStudentScores(int studentId);
 }
