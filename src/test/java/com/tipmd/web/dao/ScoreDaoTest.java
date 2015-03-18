@@ -26,7 +26,8 @@ import com.tipmd.webapp.entity.Student;
 public class ScoreDaoTest 
 {
 	@Autowired
-	private IScoreDao scoreDao;
+	@Qualifier("iScoreDao") 
+	private IGenericDao<Score, Integer> scoreDao;
 	
 	//注意@Qualifier
 	@Autowired
@@ -60,7 +61,7 @@ public class ScoreDaoTest
 			score.setCourse(course);
 			score.setStudent(s);
 			score.setPoints(100);
-			scoreDao.addScore(score);
+			scoreDao.save(score);
 		}
 	}
 	
@@ -74,7 +75,7 @@ public class ScoreDaoTest
 		assertTrue(studentList.size() > 0);
 		
 		for(Student s:studentList) {
-			List<Score> scores = scoreDao.getStudentScores(s.getId());
+			List<Score> scores = ((IScoreDao)scoreDao).getStudentScores(s.getId());
 			
 			if(scores != null && scores.size() > 0) {
 				for(Score score:scores) {
