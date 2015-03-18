@@ -21,7 +21,7 @@
 		<association property="course" javaType="Course" resultMap="courseMap"/>
 	</resultMap>
 	
-    <insert id="createScore" parameterType="Score" useGeneratedKeys="true">
+    <insert id="save" parameterType="Score" useGeneratedKeys="true">
 	    insert into scores (student_id, course_id, points) values (#{student.id}, #{course.id}, #{points})
 	    <selectKey resultType="int" order="AFTER" keyProperty="id" >
 			SELECT LAST_INSERT_ID() AS id    
