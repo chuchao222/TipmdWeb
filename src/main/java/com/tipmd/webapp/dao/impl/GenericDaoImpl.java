@@ -2,12 +2,12 @@ package com.tipmd.webapp.dao.impl;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -30,7 +30,7 @@ import com.tipmd.webapp.dao.pager.Pager;
  * 
  * 
  * ＝＝＝＝＝＝＝＝＝Mapper xml文件中 mapper的namespace命名规范＝＝＝＝＝＝＝＝＝＝
- * 缺省的命名规范为： packagename.classname+Mapper, 比如com.tipweb.webapp.entity.ScoreMapper
+ * 缺省的命名规范为： Class name of T + Mapper, 比如ScoreMapper, StudentMapper
  * 
  * @author bowee2010
  *
@@ -41,12 +41,19 @@ import com.tipmd.webapp.dao.pager.Pager;
 @SuppressWarnings("unchecked")
 @Repository
 @Transactional
-//@Scope(value="prototype")
 public abstract class GenericDaoImpl<T extends Serializable, PK extends Serializable> implements IGenericDao<T, PK> {
 
 	@Autowired protected SqlSessionTemplate sqlSessionTemplate;  
 	protected Logger log = Logger.getLogger(getClass());
-	//private GenericDaoConfiguration configuration;
+	protected GenericDaoConfiguration defaultConfiguration;
+	private GenericDaoConfiguration configuration;
+	
+	public GenericDaoImpl() {
+		Type type = getClass().getGenericSuperclass();
+		 Type trueType = ((ParameterizedType) type).getActualTypeArguments()[0];
+		 Class<T> entityClass  = (Class<T>) trueType;
+		 defaultConfiguration = GenericDaoConfiguration.buildConfiguration(entityClass.getSimpleName()+"Mapper");
+	}
 	
 	@Override
 	public void save(T entity) {
@@ -79,6 +86,28 @@ public abstract class GenericDaoImpl<T extends Serializable, PK extends Serializ
 	@Override
 	public T findById(PK id) {
 		return sqlSessionTemplate.selectOne(getStatement(getConfiguration().getFindByIdMapperId()), id);
+	}
+	
+	/*
+	 * 如果子类想用自己的GenericDaoConfiguration代替缺省的，那么请继承此方法.
+	 */
+	abstract protected GenericDaoConfiguration buildConfiguration();
+	
+	private String getStatement(String mapperId) {
+		String namespace = getConfiguration().getMapperNamespace();
+		return new StringBuilder(namespace).append(".").append(mapperId).toString();
+	}
+	
+	private GenericDaoConfiguration getConfiguration() {
+		if(configuration != null) return configuration;
+		
+		if(buildConfiguration() != null) {
+			this.configuration = buildConfiguration();
+		} else {
+			this.configuration = defaultConfiguration;
+		}
+		
+		return configuration;
 	}
 	
 	public static class GenericDaoConfiguration {
@@ -120,13 +149,14 @@ public abstract class GenericDaoImpl<T extends Serializable, PK extends Serializ
 
 			if(StringUtils.isEmpty(mapperNamespace)) 
 				throw new IllegalArgumentException("You should specify mapper namespace.");
-			this.mapperNamespace = mapperNamespace;
-			this.saveMapperId = saveMapperId;
-			this.updateMapperId = updateMapperId;
-			this.deleteMapperId = deleteMapperId;
-			this.findAllMapperId = findAllMapperId;
-			this.findCountOfAllMapperId = findCountOfAllMapperId;
-			this.findByIdMapperId = findByIdMapperId;
+
+			setMapperNamespace(mapperNamespace);
+			setSaveMapperId(saveMapperId);
+			setUpdateMapperId(updateMapperId);
+			setDeleteMapperId(deleteMapperId);
+			setFindAllMapperId(findAllMapperId);
+			setFindCountOfAllMapperId(findCountOfAllMapperId);
+			setFindByIdMapperId(findByIdMapperId);
 		}
 		
 		public static GenericDaoConfiguration buildConfiguration(String mapperNamespace) {
@@ -158,39 +188,61 @@ public abstract class GenericDaoImpl<T extends Serializable, PK extends Serializ
 			this.mapperNamespace = mapperNamespace;
 			return this;
 		}
+		
 		public String getSaveMapperId() {
 			return saveMapperId;
 		}
 		public GenericDaoConfiguration setSaveMapperId(String saveMapperId) {
-			this.saveMapperId = saveMapperId;
+			if(StringUtils.isEmpty(saveMapperId)) 
+				this.saveMapperId = DEFAULT_SAVE_MAPPER_ID;
+			else
+				this.saveMapperId = saveMapperId;
+			
 			return this;
 		}
+		
 		public String getUpdateMapperId() {
 			return updateMapperId;
 		}
 		public GenericDaoConfiguration setUpdateMapperId(String updateMapperId) {
-			this.updateMapperId = updateMapperId;
+			if(StringUtils.isEmpty(updateMapperId)) 
+				this.updateMapperId = DEFAULT_UPDATE_MAPPER_ID;
+			else
+				this.updateMapperId = updateMapperId;
 			return this;
 		}
+		
 		public String getDeleteMapperId() {
 			return deleteMapperId;
 		}
 		public GenericDaoConfiguration setDeleteMapperId(String deleteMapperId) {
-			this.deleteMapperId = deleteMapperId;
+			if(StringUtils.isEmpty(deleteMapperId)) 
+				this.deleteMapperId = DEFAULT_DELETE_MAPPER_ID;
+			else
+				this.deleteMapperId = deleteMapperId;
+			
 			return this;
 		}
 		public String getFindAllMapperId() {
 			return findAllMapperId;
 		}
 		public GenericDaoConfiguration setFindAllMapperId(String findAllMapperId) {
-			this.findAllMapperId = findAllMapperId;
+			if(StringUtils.isEmpty(findAllMapperId)) 
+				this.findAllMapperId = DEFAULT_FIND_ALL_MAPPER_ID;
+			else
+				this.findAllMapperId = findAllMapperId;
+			
 			return this;
 		}
 		public String getFindByIdMapperId() {
 			return findByIdMapperId;
 		}
 		public GenericDaoConfiguration setFindByIdMapperId(String findByIdMapperId) {
-			this.findByIdMapperId = findByIdMapperId;
+			if(StringUtils.isEmpty(findByIdMapperId)) 
+				this.findByIdMapperId = DEFAULT_FIND_BY_ID_MAPPER_ID;
+			else
+				this.findByIdMapperId = findByIdMapperId;
+			
 			return this;
 		}
 
@@ -199,35 +251,23 @@ public abstract class GenericDaoImpl<T extends Serializable, PK extends Serializ
 		}
 
 		public GenericDaoConfiguration setFindCountOfAllMapperId(String findCountOfAllMapperId) {
-			this.findCountOfAllMapperId = findCountOfAllMapperId;
+			if(StringUtils.isEmpty(findCountOfAllMapperId)) 
+				this.findCountOfAllMapperId = DEFAULT_FIND_COUNT_OF_ALL_MAPPER_ID;
+			else
+				this.findCountOfAllMapperId = findCountOfAllMapperId;
+			
 			return this;
 		}
-	}
-	
-	/*
-	 * 如果子类想用自己的GenericDaoConfiguration代替缺省的，那么请继承此方法.
-	 */
-	abstract protected GenericDaoConfiguration buildConfiguration();
-	
-	private String getStatement(String mapperId) {
-		String namespace = getConfiguration().getMapperNamespace();
-		return new StringBuilder(namespace).append(".").append(mapperId).toString();
-	}
-	
-	private GenericDaoConfiguration getConfiguration() {
-//		if(configuration != null) return configuration;
-//		
-//		if(buildConfiguration() != null) {
-//			this.configuration = buildConfiguration();
-//		} else {
-//			ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();  
-//			Class <T> clazz = (Class<T>) pt.getActualTypeArguments()[0];
-//	        String defaultNamespace = new StringBuffer(clazz.getSimpleName()).append("Mapper").toString();
-//	        log.info("No mapper namespace specified, use default namespace :" + defaultNamespace);
-//			this.configuration = GenericDaoConfiguration.buildConfiguration(defaultNamespace);
-//		}
-//		
-//		return configuration;
-		return buildConfiguration();
+
+		@Override
+		public String toString() {
+			return "GenericDaoConfiguration [mapperNamespace="
+					+ mapperNamespace + ", saveMapperId=" + saveMapperId
+					+ ", updateMapperId=" + updateMapperId
+					+ ", deleteMapperId=" + deleteMapperId
+					+ ", findAllMapperId=" + findAllMapperId
+					+ ", findCountOfAllMapperId=" + findCountOfAllMapperId
+					+ ", findByIdMapperId=" + findByIdMapperId + "]";
+		}
 	}
 }

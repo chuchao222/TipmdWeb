@@ -10,14 +10,6 @@ import com.tipmd.webapp.entity.Student;
 @Transactional
 public class StudentDaoImpl extends GenericDaoImpl<Student, Integer> implements IStudentDao 
 {
-	private static GenericDaoConfiguration configuration = GenericDaoConfiguration.buildConfiguration("CourseMapper")
-			.setSaveMapperId("createStudent")
-			.setUpdateMapperId("updateStudent")
-			.setDeleteMapperId("deleteStudent")
-			.setFindAllMapperId("getStudents")
-			.setFindCountOfAllMapperId("getCountOfStudents")
-			.setFindByIdMapperId("getStudentById");;
-	
 	@Override
 	public int createStudent(Student student) {
 		sqlSessionTemplate.insert("StudentMapper.createStudent", student);
@@ -31,15 +23,12 @@ public class StudentDaoImpl extends GenericDaoImpl<Student, Integer> implements 
 
 	@Override
 	protected GenericDaoConfiguration buildConfiguration() {
-		return configuration;
+		return GenericDaoConfiguration.buildConfiguration("StudentMapper")
+				.setSaveMapperId("createStudent")
+				.setUpdateMapperId("updateStudent")
+				.setDeleteMapperId("deleteStudent")
+				.setFindAllMapperId("getStudents")
+				.setFindCountOfAllMapperId("getCountOfStudents")
+				.setFindByIdMapperId("getStudentById");
 	}
-	
-	//如果子类的mapperid 和 namespace 遵守命名规范，此方法可以直接返回null。
-	//有关命名规范请参考 GenericDaoImpl 开头的注释
-	/*
-	@Override
-	protected GenericDaoConfiguration buildConfiguration() {
-		return null;
-	}
-	*/
 }

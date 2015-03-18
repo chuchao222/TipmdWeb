@@ -1,19 +1,20 @@
 package com.tipmd.webapp.dao.impl;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.tipmd.webapp.dao.iface.ICourseDao;
 import com.tipmd.webapp.entity.Course;
-import com.tipmd.webapp.entity.Student;
 
 @Repository("iCourseDao")
-public class CourseDaoImpl extends GenericDaoImpl<Student, Integer> implements ICourseDao {
+@Transactional
+public class CourseDaoImpl extends GenericDaoImpl<Course, Integer> implements ICourseDao {
 
-	private static GenericDaoConfiguration configuration = GenericDaoConfiguration.buildConfiguration("CourseMapper");
-	
 	@Override
 	protected GenericDaoConfiguration buildConfiguration() {
-		return configuration;
+		//可以返回null因为mapper id符合规范,这里做测试所以返回了非null
+		//return null;
+		return GenericDaoConfiguration.buildConfiguration("CourseMapper");
 	}
 	
 	@Override
