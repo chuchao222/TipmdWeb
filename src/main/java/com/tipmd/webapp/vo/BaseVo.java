@@ -13,6 +13,8 @@ public class BaseVo implements Serializable
 	private int pageSize;
 	@JsonIgnore
 	private String keyword;
+	@JsonIgnore
+	private int total; //纪录总数
 	
 	public int getPage() {
 		return page;
@@ -31,5 +33,11 @@ public class BaseVo implements Serializable
 	}
 	public void setKeyword(String keyword) {
 		this.keyword = keyword;
+	}
+	public int getTotal() {
+		return total;
+	}
+	public void setTotal(int total) {
+		this.total = total;
 	}
 }

@@ -19,9 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.tipmd.webapp.dao.iface.IGenericDao;
 import com.tipmd.webapp.dao.iface.IStudentDao;
+import com.tipmd.webapp.dao.pager.Pager;
 import com.tipmd.webapp.entity.Student;
 import com.tipmd.webapp.entity.Student.Sex;
-
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "/spring-config.xml")
@@ -41,8 +41,10 @@ public class StudentDaoTest
 	@Transactional
 	@Rollback(true)
 	public void testInsertAndDeleteStudent() {
+		
 		Student student = new Student();
-		student.setBirthday(new Date()).setName("汤东").setPwd("123456").setSex(Sex.Male);
+		student.setBirthday(com.tipmd.webapp.utils.DateUtil.string2Date("1988-06-01", "yyy-MM-dd"))
+				.setName("汤东").setPwd("123456").setSex(Sex.Male);
 		int id = ((IStudentDao)studentDao).createStudent(student);
 		log.debug("id="+id);
 		assertTrue(id > 0);
@@ -57,18 +59,19 @@ public class StudentDaoTest
 	@Rollback(true)
 	public void testGetStudent() {
 		Student cond = new Student();
-		List<Student> list = studentDao.findAll(cond, null);
+		Pager pager = new Pager(2, 2); 
+		List<Student> list = studentDao.findAll(cond, pager);
 		assertNotNull(list);
-		assertTrue(list.size() > 0);
-		Student studentWithScores = null;
+		assertTrue(list.size() == 2);
+		//Student studentWithScores = null;
 		for(Student s:list) {
 			log.info("-------------------------");
 			log.info(s);
-			assertTrue(s.getScores() == null || s.getScores().size() == 0);
 			log.info("-------------------------");
-			studentWithScores = ((IStudentDao)studentDao).getStudentWithScores(s.getId());
-			log.info(studentWithScores);
+			//studentWithScores = ((IStudentDao)studentDao).getStudentWithScores(s.getId());
+			//log.info(studentWithScores);
 		}
+		log.debug("total items :" + pager.getTotalCount());
 	}
 	
 	@Test
@@ -98,5 +101,6 @@ public class StudentDaoTest
 			
 		}
 	}
+	
 	
 }

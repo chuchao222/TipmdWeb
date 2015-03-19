@@ -44,8 +44,12 @@ public class Orders {
 	}
 
 	
-	List<Order> getOrderList() {
+	public List<Order> getOrderList() {
 		return orderList;
+	}
+	
+	public boolean isContainAnyOrder() {
+		return orderList.size() > 0;
 	}
 
 	/**
@@ -55,7 +59,7 @@ public class Orders {
 	public String convertToSQL() {
 		if(orderList == null || orderList.size() == 0) return "";
 		
-		StringBuilder s = new StringBuilder(" ORDER BY ");
+		StringBuilder s = new StringBuilder("ORDER BY ");
 		for(Order order:orderList) {
 			s.append(order.getProperty());
 			s.append(BLANK);

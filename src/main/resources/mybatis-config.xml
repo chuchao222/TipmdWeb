@@ -27,12 +27,17 @@
 		<!-- <typeAlias alias="Student" type="com.tipmd.webapp.entity.Student"/>   -->
     </typeAliases>
     
+    <plugins>
+    	<plugin interceptor="com.tipmd.webapp.dao.pager.PagerInterceptor">
+    		<property name="dialectClass" value="com.tipmd.webapp.dao.pager.dialect.MysqlDialect"/> <!-- 使用mysql方言类来生成翻页以及求纪录总数的sql -->
+    	</plugin>
+    </plugins>
+    
 	<mappers>
 		<!-- 使用package可以导入指定包里面所有的mapper class，但是如何导入所有Mapper xml呢?  -->
 		<!-- 
 		<package name="com.tipmd.webapp.dao.mapper"/>
 		 -->
-		 
 		<!-- use following configuration to configure mapper files -->
 		<mapper resource="com/tipmd/webapp/dao/mapper/StudentMapper.xml" />
 		<mapper resource="com/tipmd/webapp/dao/mapper/CourseMapper.xml" />
