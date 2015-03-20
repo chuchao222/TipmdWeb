@@ -59,10 +59,11 @@ public class StudentDaoTest
 	@Rollback(true)
 	public void testGetStudent() {
 		Student cond = new Student();
-		Pager pager = new Pager(2, 2); 
+		Pager pager = new Pager(2, 6); 
+		pager.addOrder("id", null).addOrder("birthday", Pager.Ordering.DESC);
 		List<Student> list = studentDao.findAll(cond, pager);
 		assertNotNull(list);
-		assertTrue(list.size() == 2);
+		
 		//Student studentWithScores = null;
 		for(Student s:list) {
 			log.info("-------------------------");

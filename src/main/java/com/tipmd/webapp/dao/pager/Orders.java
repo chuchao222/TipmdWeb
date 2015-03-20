@@ -2,36 +2,20 @@ package com.tipmd.webapp.dao.pager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-
-import org.springframework.util.StringUtils;
 
 /**
  * @author bowee2010
  *
  * 排序类
  */
-public class Orders {
+class Orders {
 	private List<Order> orderList;
 	private final static String COMMA = ",";
 	private final static String BLANK = " ";
-	private final static int INIT_ORDER_LIST_SIZE = 3;
-	private final static Order.Ordering DEFAULT_ORDERING = Order.Ordering.ASC;
 	
-	public static Orders buildOrders(String property, Order.Ordering ordering) {
-		if(StringUtils.isEmpty(property) || property.trim().length() == 0)
-			throw new IllegalArgumentException("Build orders failed: You cannot specify a null property.");
-		if(ordering == null)
-			ordering = DEFAULT_ORDERING;
-		
-		Order order =  new Order(property, ordering);
-		Orders orders = new Orders(INIT_ORDER_LIST_SIZE);
-		orders.getOrderList().add(order);
-		return orders;
-	}
-	
-	public void addOrder(String property, Order.Ordering ordering) {
+	public Orders addOrder(String property, String ordering) {
 		getOrderList().add(new Order(property, ordering));
+		return this;
 	}
 	
 	public void addOrder(Order order) {
@@ -59,8 +43,9 @@ public class Orders {
 	public String convertToSQL() {
 		if(orderList == null || orderList.size() == 0) return "";
 		
-		StringBuilder s = new StringBuilder("ORDER BY ");
+		StringBuilder s = new StringBuilder("ORDER BY");
 		for(Order order:orderList) {
+			s.append(BLANK);
 			s.append(order.getProperty());
 			s.append(BLANK);
 			s.append(order.getOrdering());
@@ -76,9 +61,9 @@ public class Orders {
 	
 	public static class Order {
 		private String property;
-		private Ordering ordering;
+		private String ordering;
 		
-		public Order(String property, Ordering ordering) {
+		public Order(String property, String ordering) {
 			this.property = property;
 			this.ordering = ordering;
 		}
@@ -87,16 +72,9 @@ public class Orders {
 			return property;
 		}
 	
-		public void setProperty(String property) {
-			this.property = property;
-		}
-	
-		public Ordering getOrdering() {
+
+		public String getOrdering() {
 			return ordering;
-		}
-	
-		public void setOrdering(Ordering ordering) {
-			this.ordering = ordering;
 		}
 		
 		@Override
@@ -104,16 +82,5 @@ public class Orders {
 			return "Order [property=" + property + ", ordering=" + ordering + "]";
 		}
 		
-		public static enum Ordering {
-			ASC, DESC;
-
-			public static Ordering from(String value) {
-				try {
-					return Ordering.valueOf(value.toUpperCase(Locale.US));
-				} catch (Exception e) {
-					return ASC;
-				}
-			}
-		}
 	}
 }

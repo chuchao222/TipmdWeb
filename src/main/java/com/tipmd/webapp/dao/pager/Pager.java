@@ -79,6 +79,11 @@ public class Pager extends RowBounds implements Serializable
 		return orders;
 	}
 
+	public Pager addOrder(String property, Ordering ordering) {
+		getOrders().addOrder(new Orders.Order(property, Ordering.valueOf(ordering)));
+		return this;
+	}
+	
 	public boolean isGetTotalCount() {
 		return isGetTotalCount;
 	}
@@ -99,12 +104,21 @@ public class Pager extends RowBounds implements Serializable
 	
 	//忽略order by
 	public void ignoreOrderBy() {
-		//orders.getOrderList().clear();
+		orders.getOrderList().clear();
 		orders = null;
 	}
 	
 	public String getOrderString() {
-		if(orders == null) return null;
-		return orders.convertToSQL();
+		return orders == null ? null : orders.convertToSQL();
+	}
+	
+	public static enum Ordering {
+		ASC, DESC;
+		public static String valueOf(Ordering ordering) {
+			if(ordering == null || ordering == ASC) 
+				return "ASC";
+			
+			return "DESC";
+		}
 	}
 }
