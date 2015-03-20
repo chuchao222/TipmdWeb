@@ -56,7 +56,7 @@
 	</insert>
 	
 	<select id="getStudents" resultMap="studentMap" parameterType="Student">
-		select * from students 
+		select * from students where id > 10 
 	</select>
 	
 	<select id="getCountOfStudents" resultType="int" parameterType="Student">
