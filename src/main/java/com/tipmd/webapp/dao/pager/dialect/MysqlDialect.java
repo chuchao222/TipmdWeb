@@ -41,8 +41,7 @@ public class MysqlDialect extends Dialect {
 	@Override
 	public String buildCountString(final String originalSQL) {
 		String originalSQLInLowerCase = originalSQL;
-		originalSQLInLowerCase = originalSQLInLowerCase.replaceAll("\\s+order\\s+by\\s+.+", " "); //去掉order by
-		originalSQLInLowerCase = originalSQLInLowerCase.replaceAll("\\s+ORDER\\s+BY\\s+.+", " "); //去掉ORDER BY
+		originalSQLInLowerCase = originalSQLInLowerCase.replaceAll("\\s+(?i)order\\s+(?i)by\\s+.+", " "); //去掉order by, 忽略大小写
 		
 		int fromIndex = originalSQLInLowerCase.toLowerCase().indexOf("from");
 		return "SELECT COUNT(*) " + originalSQLInLowerCase.substring(fromIndex-1);
